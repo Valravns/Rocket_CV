@@ -18,7 +18,7 @@
         </nav>
     </div>
     <div class="form-contents">
-        <form method="post" action="#">
+        <form method="post" action="addCV.php">
             <a style="margin-top: 10vh;"><b>Create a CV</a>
             <br>
             <input type="text" name="first" placeholder="First Name..." required /> 
@@ -34,8 +34,8 @@
                 $result = mysqli_query($dbConn, $sql);
 
                 if (mysqli_num_rows($result) > 0) {
-                    echo "<select name='option' required>"; 
-                    echo "<option value='choose'>Choose university...</option>";
+                    echo "<select name='option' id='requireUni' required>"; 
+                    echo "<option value='choose' disabled selected hidden>Choose university...</option>";
                     while ($row = mysqli_fetch_assoc($result)) {
                         echo "<option value='".$row["university_id"]."'>".$row["university_name"]."</option>";
                     }
@@ -46,21 +46,21 @@
             </div>
 
 
-            <label>Select Skills:</label><br>
+            <label>Select Skills: (multiple choice)</label><br>
             <div class="skill-add">
             <?php
                 $sql = "SELECT * FROM Skills";
                 $result = mysqli_query($dbConn, $sql);
 
                 if (mysqli_num_rows($result) > 0) {
-                    echo "<select name='option' multiple required>"; 
+                    echo "<select name='optiont' multiple required>"; 
                     while ($row = mysqli_fetch_assoc($result)) {
                         echo "<option value='".$row["skill_id"]."'>".$row["skill"]."</option>";
                     }
                     echo "</select>";
                 }
             ?>
-            <button type="button"><img src="pencil_b.png"></button>
+            <button type="button" id="skillPopup"><img src="pencil_b.png"></button>
             </div>
 
             <input type="submit" name="subm" value="Save the CV"/>
@@ -69,55 +69,136 @@
 
     <div id="uni-popup" class="uni-popup">
         <div class="uni-popup-content">
-            <span class="close">&times;</span>
-            <h2>Add a new university</h2>
+            <span class="uni-close">&times;</span>
+            <h2>Add a new university</h2> <br>
             <form id="addUniForm">
-            <input type="text" id="uniName" name="uniName" placeholder="Name of the unviersity..." required>
-            <input type="text" id="uniGrade" name="uniGrade" placeholder="Accreditation grade..." required>
-            <button type="submit" name="uniSubm">Add</button>
+                <input type="text" id="uniName" name="uniName" placeholder="Name of the unviersity..." required>
+                <input type="text" id="uniGrade" name="uniGrade" placeholder="Accreditation grade..." required>
+                <button type="submit" name="uniSubm">Add</button>
+            </form>
+        </div>
+    </div>
+    <script>
+        document.querySelector('form').addEventListener('submit', function(e) {
+        var selectElement = document.getElementById('requireUni');
+        if (selectElement.value === "choose") {
+            e.preventDefault();
+            alert('Please select a university!');
+        }
+});
+    </script>
+    <script>
+        document.getElementById('uniPopup').addEventListener('click', function() {
+        document.getElementById('uni-popup').style.display = 'flex';
+        });
+
+        document.querySelector('.uni-close').addEventListener('click', function() {
+        document.getElementById('uni-popup').style.display = 'none';
+        });
+
+        document.getElementById('addUniForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            var uniName = document.getElementById('uniName').value;
+            var uniGrade = document.getElementById('uniGrade').value;
+    
+            var checkU = new XMLHttpRequest();
+            checkU.open('POST', 'checkUni.php', true);
+            checkU.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+
+            checkU.onreadystatechange = function() {
+                if (checkU.readyState == 4 && checkU.status == 200) {
+                    var checkResponse = JSON.parse(checkU.responseText);
+
+                    if (checkResponse.status === 'exists') {
+                        alert(checkResponse.message);
+                    } else {
+                        var addU = new XMLHttpRequest();
+                        addU.open('POST', 'addUni.php', true);
+                        addU.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+
+                        addU.onreadystatechange = function() {
+
+                            if (addU.readyState == 4 && addU.status == 200) {
+                                var addResponse = JSON.parse(addU.responseText);
+
+                                if (addResponse.status === 'success') {
+                                    alert(addResponse.message);
+                                    document.getElementById('uni-popup').style.display = 'none';
+
+                                    var selectElement = document.querySelector('select[name="option"]');
+                                    var newUni = document.createElement('option');
+                                    newUni.value = addResponse.newUniId;
+                                    newUni.textContent = uniName;
+                                    newUni.selected = true;
+                                    selectElement.appendChild(newUni);
+
+                                    document.getElementById('uniName').value = '';
+                                    document.getElementById('uniGrade').value = '';
+                                } else {
+                                    alert(addResponse.message);
+                                }
+                            }
+                        };
+                        addU.send('uniName=' + encodeURIComponent(uniName) + '&uniGrade=' + encodeURIComponent(uniGrade));
+                    }
+                }
+            };
+            checkU.send('uniName=' + encodeURIComponent(uniName));
+        });
+    </script>
+
+    <div id="skill-popup" class="skill-popup">
+        <div class="skill-popup-content">
+            <span class="skill-close">&times;</span>
+            <h2>Add a new skill</h2> <br>
+            <form id="addSkillForm">
+                <input type="text" id="skillName" name="skillName" placeholder="Name of the skill..." required>
+                <button type="submit" name="skillSubm">Add</button>
+            </form>
         </div>
     </div>
 
-        <script>
-            document.getElementById('uniPopup').addEventListener('click', function() {
-            document.getElementById('uni-popup').style.display = 'flex';
+    <script>
+        document.getElementById('skillPopup').addEventListener('click', function() {
+            document.getElementById('skill-popup').style.display = 'flex';
             });
 
-            document.querySelector('.close').addEventListener('click', function() {
-            document.getElementById('uni-popup').style.display = 'none';
+        document.querySelector('.skill-close').addEventListener('click', function() {
+            document.getElementById('skill-popup').style.display = 'none';
             });
 
-            document.getElementById('addUniForm').addEventListener('submit', function(e) {
-                e.preventDefault();
-                var uniName = document.getElementById('uniName').value;
-                var uniGrade = document.getElementById('uniGrade').value;
-    
-                var xhr = new XMLHttpRequest();
-                xhr.open('POST', 'addUni.php', true);
-                xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-                xhr.onreadystatechange = function() {
-                    if (xhr.readyState == 4 && xhr.status == 200) {
-                        var response = JSON.parse(xhr.responseText);
+        document.getElementById('addSkillForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            var skillName = document.getElementById('skillName').value;
 
-                        if (response.status == 'success') {
-                            alert(response.message);
-                            document.getElementById('uni-popup').style.display = 'none';
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', 'addSkill.php', true);
+            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+            xhr.onreadystatechange = function() {
 
-                            var selectElement = document.querySelector('select[name="option"]');
-                            var newUni = document.createElement('option');
-                            newUni.value = response.newUniId;
-                            newUni.textContent = uniName;
-                            selectElement.appendChild(newUni);
+                if (xhr.readyState == 4 && xhr.status == 200) {
+                    var response = JSON.parse(xhr.responseText);
+
+                    if (response.status == 'success') {
+                        alert(response.message);
+                        document.getElementById('skill-popup').style.display = 'none';
+
+                        var selectElement = document.querySelector('select[name="optiont"]');
+                        var newSkill = document.createElement('option');
+                        newSkill.value = response.newSkillId;
+                        newSkill.textContent = skillName;
+                        selectElement.appendChild(newSkill);
                 
-                            document.getElementById('uniName').value = '';
-                            document.getElementById('uniGrade').value = '';
-                        } else {
-                            alert(response.message);
-                        }
+                        newSkill.selected = true;
+                        document.getElementById('skillName').value = '';
+                    } else {
+                        alert(response.message);
                     }
-                };
-                xhr.send('uniName=' + encodeURIComponent(uniName) + '&uniGrade=' + encodeURIComponent(uniGrade));
-            });
-        </script>
+                }
+            };
+            xhr.send('skillName=' + encodeURIComponent(skillName));
+        });
+    </script>
+
 </body>
 </html>

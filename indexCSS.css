@@ -90,7 +90,7 @@
     background-color: #c5b6b6a4;
 }
 
-form input[type="submit"]:hover, .uni-popup-content form button:hover {
+form input[type="submit"]:hover, .uni-popup-content form button:hover, .skill-popup-content form button:hover {
     background-color: #d8441c;
     cursor: pointer;
 }
@@ -113,7 +113,7 @@ form .uni-add button, .skill-add button {
     margin-top: -15px;
 }
 
-.uni-popup {
+.uni-popup, .skill-popup {
   display: none;
   position: fixed;
   top: 0;
@@ -126,7 +126,7 @@ form .uni-add button, .skill-add button {
   z-index: 1000;
 }
 
-.uni-popup-content {
+.uni-popup-content, .skill-popup-content {
   background-color: #fefefe;
   margin: auto;
   padding: 20px;
@@ -136,22 +136,26 @@ form .uni-add button, .skill-add button {
   text-align: center;
 }
 
-.close {
+.uni-close, .skill-close {
   color: #aaa;
   float: right;
   font-size: 28px;
   font-weight: bold;
 }
 
-.close:hover,
-.close:focus {
+.uni-close:hover,
+.uni-close:focus,
+.skill-close:hover,
+.skill-close:focus {
   color: black;
   text-decoration: none;
   cursor: pointer;
 }
 
 .uni-popup-content form input,
-.uni-popup-content form button {
+.uni-popup-content form button,
+.skill-popup-content form input,
+.skill-popup-content form button {
   width: 500%;
   font-size: 20px; 
   padding: 10px;
