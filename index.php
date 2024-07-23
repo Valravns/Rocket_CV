@@ -13,7 +13,7 @@
         <nav>
             <ul>
                 <li><a href="index.php"><b>Submit CV</b></a></li>
-                <li><a href="Inqueries.php"><b>Inquiries</b></a></li>
+                <li><a href="inquiries.php"><b>Inquiries</b></a></li>
             </ul>
         </nav>
     </div>
@@ -53,7 +53,7 @@
                 $result = mysqli_query($dbConn, $sql);
 
                 if (mysqli_num_rows($result) > 0) {
-                    echo "<select name='optiont' multiple required>"; 
+                    echo "<select name='optiont[]' multiple required>"; 
                     while ($row = mysqli_fetch_assoc($result)) {
                         echo "<option value='".$row["skill_id"]."'>".$row["skill"]."</option>";
                     }
@@ -171,32 +171,49 @@
             e.preventDefault();
             var skillName = document.getElementById('skillName').value;
 
-            var xhr = new XMLHttpRequest();
-            xhr.open('POST', 'addSkill.php', true);
-            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-            xhr.onreadystatechange = function() {
 
-                if (xhr.readyState == 4 && xhr.status == 200) {
-                    var response = JSON.parse(xhr.responseText);
+            var checkS = new XMLHttpRequest();
+            checkS.open('POST', 'checkSkill.php', true);
+            checkS.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
 
-                    if (response.status == 'success') {
-                        alert(response.message);
-                        document.getElementById('skill-popup').style.display = 'none';
+            checkS.onreadystatechange = function() {
+                if (checkS.readyState == 4 && checkS.status == 200) {
+                    var checkResponse = JSON.parse(checkS.responseText);
 
-                        var selectElement = document.querySelector('select[name="optiont"]');
-                        var newSkill = document.createElement('option');
-                        newSkill.value = response.newSkillId;
-                        newSkill.textContent = skillName;
-                        selectElement.appendChild(newSkill);
-                
-                        newSkill.selected = true;
-                        document.getElementById('skillName').value = '';
+                    if (checkResponse.status === 'exists') {
+                        alert(checkResponse.message);
                     } else {
-                        alert(response.message);
+
+                        var addS = new XMLHttpRequest();
+                        addS.open('POST', 'addSkill.php', true);
+                        addS.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+                        addS.onreadystatechange = function() {
+
+                        if (addS.readyState == 4 && addS.status == 200) {
+                            var response = JSON.parse(addS.responseText);
+
+                            if (response.status == 'success') {
+                                alert(response.message);
+                                document.getElementById('skill-popup').style.display = 'none';
+
+                                var selectElement = document.querySelector('select[name="optiont"]');
+                                var newSkill = document.createElement('option');
+                                newSkill.value = response.newSkillId;
+                                newSkill.textContent = skillName;
+                                selectElement.appendChild(newSkill);
+                
+                                newSkill.selected = true;
+                                document.getElementById('skillName').value = '';
+                            } else {
+                                alert(response.message);
+                            }
+                            }
+                        };
+                        addS.send('skillName=' + encodeURIComponent(skillName));
                     }
                 }
             };
-            xhr.send('skillName=' + encodeURIComponent(skillName));
+            checkS.send('skillName=' + encodeURIComponent(skillName));
         });
     </script>
 
