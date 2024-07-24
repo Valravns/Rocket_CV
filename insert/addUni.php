@@ -1,5 +1,5 @@
 <?php
-include 'config.php';
+include '../database/config.php';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $uniName = $_POST['uniName'];

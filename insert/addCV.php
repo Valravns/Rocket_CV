@@ -1,5 +1,5 @@
 <?php
-include 'config.php';
+include '../database/config.php';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $firstName = $_POST['first'];
@@ -23,7 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $stmt->fetch();
         $stmt->close();
         $dbConn->close();
-        header("Location: showCV.php?id_person=$personId&id_university=$university&match=1");
+        header("Location: ../print/showCV.php?id_person=$personId&id_university=$university&match=1");
         exit();
     } else {
         $addPersonSql = "INSERT INTO Person (first_name, middle_name, last_name, date_of_birth) VALUES (?, ?, ?, ?)";
@@ -38,42 +38,31 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 $stmt = $dbConn->prepare($addPersonSkillsSql);
                 $stmt->bind_param('ii', $newPersonId, $skill);
                 if(!$stmt->execute()) {
-                    $response = [
-                        "status" => "error",
-                        "message" => "Error with adding the person skills: " . $stmt->error
-                    ];
-                    header('Content-Type: application/json');
-                    echo json_encode($response);
+                    ?><script>alert("Error with adding the person skills.");</script><?php
+                    header("Location: ../index.php");
                     exit();
                 }
             }
             $stmt->close();
-            $addCVSql = "INSERT INTO CV (id_person, id_university) VALUES (?,?)";
+            $dateOfApplying = date('y-m-d');
+            $addCVSql = "INSERT INTO CV (id_person, id_university, date_of_applying) VALUES (?,?, ?)";
             $stmt = $dbConn->prepare($addCVSql);
-            $stmt->bind_param('ii', $newPersonId, $university);
+            $stmt->bind_param('iis', $newPersonId, $university, $dateOfApplying);
 
             if ($stmt->execute()) {
                 $stmt->close();
                 $dbConn->close();
-                header("Location: showCV.php?id_person=$newPersonId&id_university=$university");
+                header("Location: ../print/showCV.php?id_person=$newPersonId&id_university=$university");
                 exit();
             }
             else {
-                $response = [
-                    "status" => "error",
-                    "message" => "Error with adding the CV: " . $stmt->error
-                ];
-                header('Content-Type: application/json');
-                echo json_encode($response);
+                ?><script>alert("Error with adding the CV.");</script><?php
+                header("Location: ../index.php");
                 exit();
             }
         } else {
-            $response = [
-                "status" => "error",
-                "message" => "Error with adding the Person: " . $stmt->error
-            ];
-            header('Content-Type: application/json');
-            echo json_encode($response);
+            ?><script>alert("Error with adding the person.");</script><?php
+            header("Location: ../index.php");
             exit();
         }
 

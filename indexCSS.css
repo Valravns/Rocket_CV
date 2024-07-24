@@ -7,7 +7,7 @@
 
   body {
     background-color: #171616; 
-    background-image: url('white_dots2.png');
+    background-image: url('../photos/used_photos/white_dots2.png');
     background-repeat: repeat;
     background-size: 300px 300px;
   }
@@ -30,7 +30,7 @@
   }
   
   nav {
-    width: 25%;
+    width: 30%;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -165,13 +165,13 @@ form .uni-add button, .skill-add button {
 }
 
 .cvPrint table{
-  position: fixed;
   color: #d8441c;
   border-color: #d8441c;
   font-size: 25px;
   width: 50%;
   margin-left: 25%;
   margin-top: 20vh;
+  margin-bottom: 20vh;
   border-collapse: collapse;
 }
 .cvPrint th {

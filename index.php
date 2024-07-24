@@ -13,22 +13,23 @@
         <nav>
             <ul>
                 <li><a href="index.php"><b>Submit CV</b></a></li>
-                <li><a href="inquiries.php"><b>Inquiries</b></a></li>
+                <li><a href="../queries/cvInq.php"><b>Show CV's</b></a></li>
+                <li><a href="../queries/skillSelectionInq.php"><b>Candidates skills</b></a></li>
             </ul>
         </nav>
     </div>
     <div class="form-contents">
-        <form method="post" action="addCV.php">
+        <form method="post" action="../insert/addCV.php">
             <a style="margin-top: 10vh;"><b>Create a CV</a>
             <br>
-            <input type="text" name="first" placeholder="First Name..." required /> 
-            <input type="text" name="middle" placeholder="Middle Name..." required /> 
-            <input type="text" name="last" placeholder="Last Name..." required /> 
-            <input type="date" name="dob" required /> 
+            <input type="text" name="first" placeholder="First Name..." pattern="[A-Za-z]{1,20}" required /> 
+            <input type="text" name="middle" placeholder="Middle Name..." pattern="[A-Za-z]{1,20}" required /> 
+            <input type="text" name="last" placeholder="Last Name..." pattern="[A-Za-z]{1,20}" required /> 
+            <input type="date" name="dob" min="1920-07-24" max="2006-07-24" required /> 
             <div class="uni-add">
             <?php
-                include 'config.php';
-                include 'create.php';
+                include '../Rocket_CV/database/config.php';
+                include '../Rocket_CV/database/create.php';
 
                 $sql = "SELECT * FROM University";
                 $result = mysqli_query($dbConn, $sql);
@@ -42,7 +43,7 @@
                     echo "</select>";
                 }
             ?>
-            <button type="button" id="uniPopup"><img src="pencil_b.png"></button>
+            <button type="button" id="uniPopup"><img src="../photos/used_photos/pencil_b.png"></button>
             </div>
 
 
@@ -60,7 +61,7 @@
                     echo "</select>";
                 }
             ?>
-            <button type="button" id="skillPopup"><img src="pencil_b.png"></button>
+            <button type="button" id="skillPopup"><img src="../photos/used_photos/pencil_b.png"></button>
             </div>
 
             <input type="submit" name="subm" value="Save the CV"/>
@@ -102,7 +103,7 @@
             var uniGrade = document.getElementById('uniGrade').value;
     
             var checkU = new XMLHttpRequest();
-            checkU.open('POST', 'checkUni.php', true);
+            checkU.open('POST', '../validation/checkUni.php', true);
             checkU.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
 
             checkU.onreadystatechange = function() {
@@ -113,7 +114,7 @@
                         alert(checkResponse.message);
                     } else {
                         var addU = new XMLHttpRequest();
-                        addU.open('POST', 'addUni.php', true);
+                        addU.open('POST', '../insert/addUni.php', true);
                         addU.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
 
                         addU.onreadystatechange = function() {
@@ -173,7 +174,7 @@
 
 
             var checkS = new XMLHttpRequest();
-            checkS.open('POST', 'checkSkill.php', true);
+            checkS.open('POST', '../validation/checkSkill.php', true);
             checkS.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
 
             checkS.onreadystatechange = function() {
@@ -185,7 +186,7 @@
                     } else {
 
                         var addS = new XMLHttpRequest();
-                        addS.open('POST', 'addSkill.php', true);
+                        addS.open('POST', '../insert/addSkill.php', true);
                         addS.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
                         addS.onreadystatechange = function() {
 
@@ -195,8 +196,8 @@
                             if (response.status == 'success') {
                                 alert(response.message);
                                 document.getElementById('skill-popup').style.display = 'none';
-
-                                var selectElement = document.querySelector('select[name="optiont"]');
+                                console.log("SUCCESS");
+                                var selectElement = document.querySelector('select[name="optiont[]"]');
                                 var newSkill = document.createElement('option');
                                 newSkill.value = response.newSkillId;
                                 newSkill.textContent = skillName;

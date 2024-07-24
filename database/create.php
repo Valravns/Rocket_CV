@@ -49,7 +49,8 @@
     $sql5 = "CREATE TABLE IF NOT EXISTS CV (
         cv_id INT(6) AUTO_INCREMENT PRIMARY KEY,
         id_person INT(6), FOREIGN KEY (id_person) REFERENCES Person(person_id),
-        id_university INT(6), FOREIGN KEY (id_university) REFERENCES University(university_id)
+        id_university INT(6), FOREIGN KEY (id_university) REFERENCES University(university_id),
+        date_of_applying DATE NOT NULL
     ) ENGINE=INNODB DEFAULT CHARSET=utf8";
     $result5 = mysqli_query($dbConn, $sql5);
     if (!$result5)

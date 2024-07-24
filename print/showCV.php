@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rocket CV</title>
-    <link rel="stylesheet" href="indexCSS.css"> 
+    <link rel="stylesheet" href="../indexCSS.css"> 
 
     
 </head>
@@ -12,13 +12,14 @@
     <div class="header">
         <nav>
             <ul>
-                <li><a href="index.php"><b>Submit CV</b></a></li>
-                <li><a href="Inqueries.php"><b>Inquiries</b></a></li>
+                <li><a href="../index.php"><b>Submit CV</b></a></li>
+                <li><a href="../queries/cvInq.php"><b>Show CV's</b></a></li>
+                <li><a href="../queries/skillSelectionInq.php"><b>Candidates skills</b></a></li>
             </ul>
         </nav>
     </div>
     <?php
-        include 'config.php';
+        include '../database/config.php';
         if(isset($_GET['match'])) {
             ?><div class="alert"><p><b>This person already exists and has a CV.</b></p></div><?php
         }
@@ -40,9 +41,9 @@
             $stmt->execute();
             $cvResult = $stmt->get_result();
             if($cvResult->num_rows > 0) {
+                $row = $cvResult->fetch_assoc();
                 echo "<div class='cvPrint'>";
-                while ($row = $cvResult->fetch_assoc()) {
-                    echo "<table border='3' cellspacing='0' cellpadding='5'>";
+                    echo "<table border='3' style='position: fixed;'>";
                         echo "<tr><th colspan='2'>CV Info</th></tr>";
                         echo "<tr><th>First name</th><td>" . $row["first_name"] . "</td></tr>";
                         echo "<tr><th>Middle name</th><td>" . $row["middle_name"] . "</td></tr>";
@@ -51,7 +52,6 @@
                         echo "<tr><th>University</th><td>" . $row["university_name"] . "</td></tr>";
                         echo "<tr><th>Skills</th><td>" . $row["skills"] . "</td></tr>";
                     echo "</table></a>";
-                }
                 echo "</div>";
             }
         }

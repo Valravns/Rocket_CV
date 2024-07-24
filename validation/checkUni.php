@@ -1,25 +1,25 @@
 <?php
-include 'config.php';
+include '../database/config.php';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $skillName = $_POST['skillName'];
+    $uniName = $_POST['uniName'];
 
-    $sql = "SELECT skill_id FROM Skills 
-        WHERE skill = ?";
+    $sql = "SELECT university_id FROM University 
+        WHERE university_name = ?";
     $stmt = $dbConn->prepare($sql);
-    $stmt->bind_param('s', $skillName);
+    $stmt->bind_param('s', $uniName);
     $stmt->execute();
     $stmt->store_result();
 
     if ($stmt->num_rows > 0) {
         $response = [
             "status" => "exists",
-            "message" => "The skill already exists!"
+            "message" => "The university already exists!"
         ];
     } else {
         $response = [
             "status" => "does not exist",
-            "message" => "The skill does not exist!"
+            "message" => "The university does not exist!"
         ];
     }
 
